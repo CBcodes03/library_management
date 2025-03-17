@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Return Book{% endblock %}
+
+{% block content %}
+    <h1>Return Book</h1>
+    
+    <!-- Display error message if form is submitted without details -->
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+    
+    <!-- Display issued books for the current user -->
+    <h2>Issued Books</h2>
+    <div class="scrollable-books">
+        <form action="{{ url_for('return_book') }}" method="POST">
+            {% for book in issued_books %}
+                <div class="form-group">
+                    <label for="book_{{ book.id }}">
+                        <input type="radio" name="book_id" value="{{ book.id }}" id="book_{{ book.id }}" required>
+                        {{ book.title }} - {{ book.author }} (Issued on: {{ book.issue_date }})
+                    </label>
+                </div>
+            {% endfor %}
+
+            <div class="form-group">
+                <label for="fine_paid">Pay Fine</label><br>
+                <label>
+                    <input type="radio" name="fine_paid" value="yes" required> Yes
+                </label>
+                <label>
+                    <input type="radio" name="fine_paid" value="no" required> No
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="remarks">Remarks (Optional)</label>
+                <textarea id="remarks" name="remarks"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Confirm Return</button>
+        </form>
+    </div>
+
+    <script>
+        // Show error if fine is not paid and "No" is selected
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function (event) {
+            const finePaidNo = document.querySelector('input[name="fine_paid"][value="no"]');
+            if (finePaidNo.checked) {
+                alert("Please pay the fine before returning the book.");
+                event.preventDefault();
+            }
+        });
+    </script>
+{% endblock %}

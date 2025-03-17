@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Issue a Book{% endblock %}
+
+{% block content %}
+    <h1>Issue a Book</h1>
+
+    {% if error %}
+        <div class="error">
+            <p>{{ error }}</p>
+        </div>
+    {% endif %}
+
+    <form method="POST" action="/issue-book">
+        <div>
+            <label for="book_name">Book Name:</label>
+            <input type="text" id="book_name" name="book_name" required>
+        </div>
+        <div>
+            <label for="author_name">Author Name:</label>
+            <input type="text" id="author_name" name="author_name" value="" readonly>
+        </div>
+        <div>
+            <label for="issue_date">Issue Date:</label>
+            <input type="date" id="issue_date" name="issue_date" min="{{ today_date }}" required>
+        </div>
+        <div>
+            <label for="return_date">Return Date:</label>
+            <input type="date" id="return_date" name="return_date" min="{{ today_date }}" max="{{ return_date }}" required>
+        </div>
+        <div>
+            <label for="remarks">Remarks:</label>
+            <textarea id="remarks" name="remarks"></textarea>
+        </div>
+        <button type="submit">Issue Book</button>
+    </form>
+
+    <script>
+        // Automatically populate the Author Name based on the Book Name
+        document.getElementById("book_name").addEventListener("input", function() {
+            var bookName = document.getElementById("book_name").value;
+
+            // Here, you can add a function to fetch the author name from the database based on the book name
+            // For now, this is just an example of automatically setting the author
+            if (bookName === "Python Programming") {
+                document.getElementById("author_name").value = "John Doe";
+            } else if (bookName === "Flask Web Development") {
+                document.getElementById("author_name").value = "Jane Smith";
+            } else {
+                document.getElementById("author_name").value = "";
+            }
+        });
+
+        // Automatically set the return date to 15 days ahead of the current date
+        var today = new Date();
+        var returnDate = new Date();
+        returnDate.setDate(today.getDate() + 15);
+
+        var returnDateString = returnDate.toISOString().split('T')[0];
+        document.getElementById("return_date").setAttribute("value", returnDateString);
+    </script>
+{% endblock %}

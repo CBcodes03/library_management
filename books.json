@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "title": "Python Programming",
+        "author": "John Doe",
+        "available": true
+    },
+    {
+        "id": 2,
+        "title": "Flask Web Development",
+        "author": "Jane Smith",
+        "available": true
+    }
+]

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership</title>
+</head>
+<body>
+    <h1>Membership</h1>
+
+    <!-- Form for Adding or Updating Membership -->
+    <form action="{{ url_for('membership') }}" method="POST">
+        <label for="action">Select Action:</label>
+        <select name="action" id="action">
+            <option value="add" selected>Add Membership</option>
+            <option value="update">Update Membership</option>
+        </select><br><br>
+
+        <!-- Add Membership Form -->
+        <div id="add-membership" class="membership-form">
+            <label for="membership_type">Membership Type (Select One):</label>
+            <select name="membership_type" id="membership_type">
+                <option value="6 months" selected>6 months</option>
+                <option value="1 year">1 year</option>
+                <option value="2 years">2 years</option>
+            </select><br><br>
+        </div>
+
+        <!-- Update Membership Form -->
+        <div id="update-membership" class="membership-form" style="display: none;">
+            <label for="membership_number">Membership Number:</label>
+            <input type="text" name="membership_number" id="membership_number" required><br><br>
+            
+            <label for="extend">Extend Membership (Optional):</label>
+            <select name="extend" id="extend">
+                <option value="6 months">6 months</option>
+                <option value="1 year">1 year</option>
+                <option value="2 years">2 years</option>
+            </select><br><br>
+            
+            <label for="cancel">Cancel Membership:</label>
+            <input type="radio" name="cancel" value="yes"> Yes
+            <input type="radio" name="cancel" value="no" checked> No<br><br>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        // Toggle between add and update membership forms
+        document.getElementById('action').addEventListener('change', function () {
+            if (this.value === 'update') {
+                document.getElementById('add-membership').style.display = 'none';
+                document.getElementById('update-membership').style.display = 'block';
+            } else {
+                document.getElementById('add-membership').style.display = 'block';
+                document.getElementById('update-membership').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

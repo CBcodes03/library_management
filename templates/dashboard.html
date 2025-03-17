@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    <h2>Welcome, {{ session['username'] }}</h2>
+    {% if session['role'] == 'admin' %}
+        <p>You have access to Maintenance, Reports, and Transactions.</p>
+    {% else %}
+        <p><a href="{{url_for('issue_book')}}">Issue A Book</a></p>
+        <p><a href="{{url_for('return_book')}}">Return A Book</a></p>
+        <p><a href="{{url_for('membership')}}">Add/Update Membership</a></p>
+        <p>E-reader</p>
+    {% endif %}
+{% endblock %}
