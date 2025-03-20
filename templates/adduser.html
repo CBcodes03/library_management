@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    <title>Add a user</title>
+    <h1>this is add user page!</h1>
+    <form method="post" action="{{url_for('add_user')}}">
+        <label>add username</label>
+        <input type="text" name="username">
+        <label>add password</label>
+        <input type="password" name="password">
+        <label name="role">add role</label>
+        <input type="text" name="role">
+        <button type="submit">submit</button>
+    </form>
+{% endblock %}

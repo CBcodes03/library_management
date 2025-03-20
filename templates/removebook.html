@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %} remove a book {% endblock %}
+{% block content %}
+<h1>remove a book</h1>
+<form action="{{url_for('delete_book')}}" method="post">
+    <label>book title:<input type="text" name="title"></label><br>
+    <label>id:<input type="text" name="id"></label><br>
+    <button type="submit" style="width: 50px; height: 30px; position: relative; margin-top: 10px; margin-left: 50px;">remove</button>
+</form>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Remove user{% endblock %}
+{% block content%}
+<h1>remove a user</h1>
+<h3>enter the specific username to delete!</h3>
+<form action="{{url_for('delete_user')}}" method="post">
+    <label>enter username:<input type="text" name="dname"></label>
+    <button type="submit">submit</button>
+</form>
+{% endblock %}

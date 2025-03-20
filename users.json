@@ -6,5 +6,9 @@
     "user": {
         "password": "user123",
         "role": "user"
+    },
+    "Chirag Budakoti": {
+        "password": "1234",
+        "role": "admin"
     }
 }

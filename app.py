@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import json
 import os
 from datetime import datetime, timedelta
+import random 
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -12,7 +13,7 @@ TRANSACTIONS_FILE='transactions.json'
 ISSUES_FILE='issues.json'
 MEMBERSHIP_FILE='membership.json'
 
-def load_json(file_path):
+def load_json(file_path): 
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
             return json.load(file)
@@ -348,6 +349,107 @@ def membership():
         return redirect(url_for('membership'))
 
     return render_template('membership.html')
+
+####admin routes
+@app.route('/add-user', methods=['GET','POST'])
+def add_user():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    if request.method == "POST":
+        uname=request.form["username"]
+        passwrd=request.form["password"]
+        urole=request.form["role"]
+        with open(USERS_FILE, 'r') as file:
+            users=json.load(file)
+        user={
+            f"{uname}":{
+                "password":f"{passwrd}",
+                "role":f"{urole}"
+            }
+        }
+        if uname in users:
+            flash(f"User {uname} already exists!")
+            return render_template('adduser.html')
+        else:
+            users.update(user)
+            with open(USERS_FILE, 'w') as file:
+                json.dump(users, file, indent=4)
+            flash("user created!")
+            return redirect(url_for('add_user'))
+    return render_template('adduser.html')
+
+@app.route('/delete-user', methods=['GET','POST'])
+def delete_user():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    if request.method == "POST":
+        uname=request.form["dname"]
+        with open(USERS_FILE, 'r') as file:
+            users=json.load(file)
+        if uname not in users:
+            flash(f"User {uname} dosn't exists!")
+            return render_template('removeuser.html')
+        else:
+            users.pop(uname)
+            with open(USERS_FILE, 'w') as file:
+                json.dump(users, file, indent=4)
+            flash("user removed!")
+            return redirect(url_for('delete_user'))
+    return render_template('removeuser.html')
+
+#########
+#book routes
+@app.route('/add-book',methods=["GET","POST"])
+def add_book():
+    if 'username' not in session:
+        return redirect(url_for('login'))    
+    if request.method == "POST":
+        with open(BOOKS_FILE, 'r') as file:
+            books=json.load(file)
+        id=random.randint(1,999999)
+        title=request.form["title"]
+        author=request.form["author"]
+        available=True
+        newBook={
+            "id":f"{id}",
+            "title":f"{title}",
+            "author":f"{author}",
+            "available":f"{available}"
+        }
+        books.append(newBook)
+        with open(BOOKS_FILE,'w') as file:
+            json.dump(books,file,indent=4)
+        flash(f"Book {title} with id {id} added!")
+        return redirect(url_for('add_book'))
+    return render_template('addbook.html')
+
+@app.route('/delete-book', methods=["GET", "POST"])
+def delete_book():
+    if 'username' not in session:
+        return redirect(url_for('login')) 
+
+    if request.method == "POST":
+        with open(BOOKS_FILE, 'r') as file:
+            books = json.load(file)
+
+        id = request.form.get('id', '').strip()  # Get ID from form and strip spaces
+        title = request.form.get("title", "").strip()
+
+        print(f"DEBUG: Received ID: {id}, Title: {title}")  # Debugging
+
+        # Convert all book IDs to strings before comparing
+        updated_books = [book for book in books if not (str(book["id"]) == id and book["title"] == title)]
+
+        if len(updated_books) == len(books):
+            flash("Book not found! Check the ID and Title.")  # If no book was removed
+        else:
+            with open(BOOKS_FILE, 'w') as file:
+                json.dump(updated_books, file, indent=4)
+            flash("Book removed successfully!")
+
+        return redirect(url_for('delete_book'))
+
+    return render_template('removebook.html')
 
 #########
 @app.route('/logout')

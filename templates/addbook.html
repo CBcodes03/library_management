@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}add book{% endblock %}
+{% block content %}
+<h1>this is add book page</h1>
+<form action="{{url_for('add_book')}}" method="post">
+    <label>book title:<input type="text" name="title"></label><br>
+    <label>author:<input type="text" name="author"></label><br>
+    <button type="submit" style="width: 50px; height: 30px; position: relative; margin-top: 10px; margin-left: 50px;">add</button>
+</form>
+{% endblock %}

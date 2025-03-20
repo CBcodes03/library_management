@@ -3,11 +3,16 @@
 {% block content %}
     <h2>Welcome, {{ session['username'] }}</h2>
     {% if session['role'] == 'admin' %}
-        <p>You have access to Maintenance, Reports, and Transactions.</p>
+        <h3>manage</h3>
+        <ul>
+            <li><a href="{{url_for('add_user')}}">add a user</a></li>
+            <li><a href="{{url_for('delete_user')}}">delete a user</a></li>
+            <li><a href="{{url_for('add_book')}}">add a book</a></li>
+            <li><a href="{{url_for('delete_book')}}">delete a book</a></li>
+        </ul>
     {% else %}
         <p><a href="{{url_for('issue_book')}}">Issue A Book</a></p>
         <p><a href="{{url_for('return_book')}}">Return A Book</a></p>
         <p><a href="{{url_for('membership')}}">Add/Update Membership</a></p>
-        <p>E-reader</p>
     {% endif %}
 {% endblock %}
