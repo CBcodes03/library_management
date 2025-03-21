@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "username": "user",
+        "book_title": "Python Programming",
+        "author": "John Doe",
+        "issue_date": "2025-03-21",
+        "return_date": "2025-03-21 23:17:05.945079",
+        "remarks": "want to learn programming",
+        "status": "returned"
+    }
+]

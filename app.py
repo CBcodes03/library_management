@@ -9,7 +9,6 @@ app.secret_key = 'your_secret_key'
 
 USERS_FILE = 'users.json'
 BOOKS_FILE = 'books.json'
-TRANSACTIONS_FILE='transactions.json'
 ISSUES_FILE='issues.json'
 MEMBERSHIP_FILE='membership.json'
 
@@ -26,7 +25,7 @@ def save_json(data, file_path):
 def initialize_books():
     if not os.path.exists(BOOKS_FILE):
         books = [
-            {'id': 1, 'title': 'Python Programming', 'author': 'John Doe', 'available': True},
+            {'id': 1, 'title': 'Python Programming', 'author': 'John Doe', 'available': True, },
             {'id': 2, 'title': 'Flask Web Development', 'author': 'Jane Smith', 'available': True}
         ]
         save_json(books, BOOKS_FILE)
@@ -44,14 +43,17 @@ def initialize_issues():
         with open(ISSUES_FILE, 'w') as file:
             json.dump([], file)
 
-def initialize_transactions():
-    if not os.path.exists(TRANSACTIONS_FILE):
-        with open(TRANSACTIONS_FILE, 'w') as file:
+def initialize_membership():
+    if not os.path.exists(MEMBERSHIP_FILE):
+        with open(MEMBERSHIP_FILE, 'w') as file:
             json.dump([], file)
+
+
 initialize_users()
 initialize_books()
 initialize_issues()
-initialize_transactions()
+initialize_membership()
+
 @app.route('/')
 def home():
     return render_template('login.html')
@@ -119,28 +121,29 @@ def issue_book():
 
         if not book:
             error = "The book name does not exist in our database."
-            return render_template('issue.html', today_date=today_date, return_date=return_date, error=error)
+            flash(f'{error}')
+            return redirect(url_for('issue_book'))
 
         # Ensure the author name matches the book (non-editable field)
         if author_name != book['author']:
             error = "Author name doesn't match the selected book."
-            return render_template('issue.html', today_date=today_date, return_date=return_date, error=error)
-
+            flash(f'{error}')
+            return redirect(url_for('issue_book'))
         # Ensure the book is available
         if not book['available']:
             error = "The selected book is currently not available."
-            return render_template('issue.html', today_date=today_date, return_date=return_date, error=error)
-
-        # Validate Issue Date (cannot be before today)
+            flash(f'{error}')
+            return redirect(url_for('issue_book'))
+        # Validate Issue Date (cannot be before today)                                                                  
         if datetime.strptime(issue_date, '%Y-%m-%d') < datetime.today():
             error = "The issue date cannot be before today."
-            return render_template('issue.html', today_date=today_date, return_date=return_date, error=error)
-
+            flash(f'{error}')
+            return redirect(url_for('issue_book'))
         # Validate Return Date (cannot be more than 15 days from today)
         if datetime.strptime(return_date_input, '%Y-%m-%d') > datetime.strptime(return_date, '%Y-%m-%d'):
             error = "The return date cannot be more than 15 days from today."
-            return render_template('issue.html', today_date=today_date, return_date=return_date, error=error)
-
+            flash(f'{error}')
+            return redirect(url_for('issue_book'))
         # If everything is valid, process the data and create an issue entry
         # Generate a new issue ID (increment the highest existing ID)
         with open('issues.json', 'r') as issue_file:
@@ -171,7 +174,7 @@ def issue_book():
         with open('books.json', 'w') as file:
             json.dump(books_data, file, indent=4)
 
-        return redirect(url_for('success_page'))  # Redirect to success page
+        return redirect(url_for('issue_book'))  # Redirect to success page
 
     return render_template('issue.html', today_date=today_date, return_date=return_date)
 ##return 
@@ -203,11 +206,6 @@ def return_book():
 
     if request.method == 'POST':
         book_id = request.form['book_id']  # Get the book ID from the form
-        serial_no = request.form['serial_no']  # Get the serial number from the form
-        return_date_input = request.form['return_date']  # Get the return date from the form
-        remarks = request.form.get('remarks', '')  # Get remarks, if any
-
-        # Search for the book issue by the logged-in user
         book_to_return = None
         for book in issued_books:
             if book['username'] == session['username'] and str(book['id']) == str(book_id):
@@ -215,37 +213,24 @@ def return_book():
                 break
 
         if not book_to_return:
-            return "No book found with that ID for the current user."
-
-        # Handle the fine logic
-        fine = 0
-        if 'fine' in book_to_return and book_to_return['fine'] > 0:
-            fine = book_to_return['fine']
-            if not request.form.get('pay_fine', False):
-                return "Please pay the fine before returning the book."
+            flash("No book found with that ID for the current user.")
+            return redirect(url_for('return_book'))
 
         # Update the book issue status to 'returned' and set return date
         book_to_return['status'] = 'returned'
-        book_to_return['return_date'] = return_date_input
-        book_to_return['remarks'] = remarks
-
-        # Add the fine details if applicable
-        if fine > 0 and request.form.get('pay_fine', False):
-            book_to_return['fine'] = fine  # Add fine if paid
-
+        book_to_return['return_date'] = str(datetime.today())  # Set return date to today
+        
         # Update the issues list in the JSON file
         update_issues(issued_books)
-
-        # Redirect to the payment page if fine is pending
-        if fine > 0:
-            return redirect(url_for('pay_fine', fine=fine))  # Adjust this URL as per your routing for payment page
-
-        return "Book returned successfully."
+        
+        flash("Book has been returned!")
+        return redirect(url_for('return_book'))
 
     # Get the list of books issued to the logged-in user
     user_books = [book for book in issued_books if book['username'] == session['username']]
     
-    return render_template('return_book.html', user_books=user_books)
+    return render_template('returnbook.html', user_books=user_books)
+
 
 ####################### **membership**
 def read_memberships():

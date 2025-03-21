@@ -3,7 +3,7 @@
         "id": 1,
         "title": "Python Programming",
         "author": "John Doe",
-        "available": true
+        "available": false
     },
     {
         "id": 2,

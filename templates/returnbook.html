@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %} return book {% endblock %}
+{% block content %}
+<h2>Select a Book to return</h2>
+
+<!-- Scrollable Books List -->
+<div class="scroll-container">
+    {% for book in user_books %}
+        <div class="book-item" onclick="fillForm('{{ book.id }}', '{{ book.book_title }}')">
+            <strong>{{ book.book_title }}</strong><br>
+            <small>ID: {{ book.id }}</small>
+        </div>
+    {% endfor %}
+</div>
+
+<form action="{{url_for('return_book')}}" method="post">
+    <input type="text" id="book_id" name="book_id" placeholder="Book ID" readonly>
+    <input type="text" id="book_title" name="book_title" placeholder="Book Title" readonly>
+    <button type="submit" id="submit-btn">Submit</button>
+</form>
+
+<div id="popup">
+    <div id="popup-content">
+        <p>Slide to confirm submission</p>
+        <div id="slider-container">
+            <div id="slider"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let slider = document.getElementById("slider");
+    let container = document.getElementById("slider-container");
+    let popup = document.getElementById("popup");
+    let form = document.getElementById("main-form");
+    let submitBtn = document.getElementById("submit-btn");
+
+    let isDragging = false;
+    let startX, currentX;
+    let maxRight = container.offsetWidth - slider.offsetWidth;
+
+    // Show the popup when clicking Submit
+    submitBtn.addEventListener("click", function() {
+        popup.style.display = "flex";
+    });
+
+    // Handle sliding movement
+    slider.addEventListener("mousedown", function (e) {
+        isDragging = true;
+        startX = e.clientX;
+    });
+    document.addEventListener("mousemove", function (e) {
+        if (isDragging) {
+            currentX = e.clientX - startX;
+            if (currentX < 0) currentX = 0;
+            if (currentX > maxRight) currentX = maxRight;
+            slider.style.left = currentX + "px";
+
+            // If fully slid, submit the form
+            if (currentX >= maxRight) {
+                popup.style.display = "none";
+                form.submit(); // Send POST request
+            }
+        }
+    });
+    document.addEventListener("mouseup", function () {
+        isDragging = false;
+        if (parseInt(slider.style.left) < maxRight) {
+            slider.style.left = "0px"; // Reset if not fully slid
+        }
+    });
+    function fillForm(bookId, bookTitle) {
+        document.getElementById("book_id").value = bookId;
+        document.getElementById("book_title").value = bookTitle;
+    }
+</script>
+{% endblock %}
